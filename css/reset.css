@@ -1,0 +1,47 @@
+*{
+    padding: 0;
+    margin: 0;
+    border: none;
+    
+}
+
+
+*:before,
+*:after {
+    box-sizing: border-box;
+}
+
+:focus,
+:active {
+    outline: none;
+}
+
+a:focus,
+a:active {
+    outline: none;
+} */
+
+/*links*/
+
+a,
+a:link,
+a:visited{
+    text-decoration: none;
+
+}
+
+a:hover{
+
+    text-decoration: none;
+}
+
+/*Common*/
+
+ position {
+    position: absolute;
+    width: 364px;
+    height: 52px;
+    left: 308px;
+    top: 40px;
+}
+ 
