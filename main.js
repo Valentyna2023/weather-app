@@ -5,72 +5,70 @@ const header = document.querySelector('.header');
 const form = document.querySelector('#form');
 const input = document.querySelector('#inputCity');
 
+// Delete card
+function removeCard() {
+    const prevCard = document.querySelector('.card');
+    if (prevCard) prevCard.remove();
+}
 
-form.onsubmit = function (e) {
+function showError(errorMessage) {
+    // Show on card
+    const html = `<div class="card">${errorMessage}</div>`;
+    // Show card on page
+    header.insertAdjacentHTML('afterend', html);
+}
 
+function showCard({ name, country, temp, condition }) {
+    const html = `<div class="card">
+    <h2 class="card-city">${name}<span>${country}</span></h2>
+    <div class="card-weather">
+      <div class="card-value">${temp}<sup>°c</sup></div>
+      <img class="card-img" src="./img/1.png" alt="Weather">
+    </div>
+    <div class="card-description">${condition}</div>
+  </div>`;
+    // Show card on page
+    header.insertAdjacentHTML('afterend', html);
+}
+
+async function getWeather(city) {
+    const url = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}`;
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.error) {
+            throw new Error(data.error.message);
+        }
+
+        console.log(data);
+        return data;
+    } catch (error) {
+        throw new Error('Failed to fetch weather data.');
+    }
+}
+
+form.onsubmit = async function (e) {
     e.preventDefault();
-
 
     let city = input.value.trim();
 
+    try {
+        const data = await getWeather(city);
 
-    const url = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}`;
+        removeCard();
 
-    fetch(url)
-        .then((response) => {
-            return response.json();
-        })
-        .then((data) => {
-            console.log(data);
+        const weatherData = {
+            name: data.location.name,
+            country: data.location.country,
+            temp: data.current.temp_c,
+            condition: data.current.condition.text,
+        };
 
-
-            //Check for mistakes
-            if (data.error) {
-
-                //Delete card
-                const prevCard = document.querySelector('.card');
-                if (prevCard) prevCard.remove();
-
-                //Show on card
-                const html = `<div class="card">${data.error.message}</div>`;
-
-                //Show card on page
-                header.insertAdjacentHTML('afterend', html);
-
-
-            } else {
-                //Delete card
-                const prevCard = document.querySelector('.card');
-                if (prevCard) prevCard.remove();
-
-                //Show on card
-
-                const html = `<div class="card">
-       <h2 class="card-city">${data.location.name}<span>${data.location.country}</span></h2>
- 
-        <div class="card-weather">
-            <div class="card-value">${data.current.temp_c}<sup>°c</sup></div>
-            <img  class="card-img" src="./img/1.png" alt="Weather">
-        </div>
-
-       <div class="card-description">${data.current.condition.text}</div>
-    </div>`;
-
-
-                //Show card on page
-                header.insertAdjacentHTML('afterend', html);
-            }
-        })
-
-
-
-
-}  //end form.onsubmit
-
-
-
-
-
-
-
+        showCard(weatherData);
+    } catch (error) {
+        removeCard();
+        showError(error.message);
+    }
+};
 
